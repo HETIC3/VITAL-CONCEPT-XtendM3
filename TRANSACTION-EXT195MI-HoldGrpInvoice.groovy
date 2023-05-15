@@ -7,6 +7,7 @@
  * Date       Changed By            Description
  * 20230127   Ludovic TRAVERS       Creation of transaction EXT195MI-HoldGrpInvoice
  */
+ 
 public class HoldGrpInvoice extends ExtendM3Transaction {
   private final MIAPI mi
   private final ProgramAPI program
@@ -38,7 +39,7 @@ public class HoldGrpInvoice extends ExtendM3Transaction {
     .selection("F2CONO", "F2DIVI", "F2JBNO", "F2JBDT", "F2JBTM", "F2GRPA", "F2GPST")
       .build()
       
-    DBContainer container = query.getContainer();
+    DBContainer container = query.getContainer()
     // Set the key fields
     container.set("F2CONO", company)
     container.set("F2DIVI", mi.inData.get("DIVI").trim())
@@ -52,25 +53,14 @@ public class HoldGrpInvoice extends ExtendM3Transaction {
       lockedResult.update()
     }
     
-    // If there is an existing record of this key, the fields are set and the record is updated in the table
+    // If there is an existing record of this key, and Status GPST = 0, then the fields are set and the record is updated in the table
     if (query.read(container)) {
-      query.readAllLock(container, 6, updateCallBack)
+      if (container.get("F2GPST") == 0) {
+        query.readAllLock(container, 6, updateCallBack)
+      }
     } else {
       // If the record doesn't already exist in the table, an error is thrown
       mi.error("L'enregistrement n'existe pas.")
-    }
-  }
-  
-  /**
-   * Check if the input field is empty. If it is not empty, the value is set to the record
-   * @param fieldToSet: the name of the field to set in the table 
-   * @param fieldToCheck: the input field of the API to control
-   * @param recordToModify: the record that will be changed in the table
-   */
-  String checkEmptyField(String fieldToSet, String fieldToCheck, LockedResult recordToModify) {
-    String wField = fieldToCheck.trim()
-    if (!wField.isEmpty()) {
-      recordToModify.set(fieldToSet, wField)
     }
   }
 }
