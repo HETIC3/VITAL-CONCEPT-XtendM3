@@ -15,6 +15,10 @@ public class HoldGrpInvoice extends ExtendM3Transaction {
   private final LoggerAPI logger
   private final UtilityAPI utility
   
+  int company
+  String divi
+  String grpa
+  
   public HoldGrpInvoice(MIAPI mi, DatabaseAPI database, LoggerAPI logger, ProgramAPI program, UtilityAPI utility) {
     this.mi = mi
     this.program = program
@@ -23,15 +27,11 @@ public class HoldGrpInvoice extends ExtendM3Transaction {
     this.utility = utility
   }
   
-  int company
-  String chid
-  int chno
-  
   public void main() {
     // Parse Transaction arguments
     company = (Integer) program.getLDAZD().CONO
-    String divi = mi.inData.get("DIVI").trim()
-    String grpa = mi.inData.get("GRPA").trim()
+    divi = mi.inData.get("DIVI").trim()
+    grpa = mi.inData.get("GRPA").trim()
     
     // Select fields to handle from table FSLGP2
     DBAction query = database.table("FSLGP2")
